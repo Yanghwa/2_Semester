@@ -9,3 +9,7 @@ individual(current working) - school's class and its' students; showing simple i
 2. Java; assignments and test
 
 EmployeeSalary - assignment for simple employee information 
+
+3. DataBase; assignments and test
+
+Class assignments and mid term test
