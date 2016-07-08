@@ -1,9 +1,9 @@
 <?php
 //connect to DB
-$host =  "us-cdbr-azure-southcentral-e.cloudapp.net";
-$username = "b3446186faf479";
-$password = "96493ba4";
-$dbname = "acsm_6461d0db74681f2";
+$host =  "hostname";
+$username = "username";
+$password = "password";
+$dbname = "dbname";
 
 //try the connection and catch exception if any and display the message
 try {

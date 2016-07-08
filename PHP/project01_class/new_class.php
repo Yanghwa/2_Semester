@@ -1,12 +1,37 @@
 <?php
-//start the session to get session variables
-session_start();
+//check if we can get teamid
+if (isset($_GET["classid"])) {
 
-//store the session array into variables
-extract($_SESSION);
+    //get connect.php to connect to database
+    require "connect/connect.php";
 
-//unset the session variables
-session_unset();
+    //build the sql
+    $sql = "SELECT * FROM tblclasses WHERE id=:id";
+
+    //prepare the sql statement
+    $sth = $dbh->prepare($sql);
+
+    //bind parameters
+    $sth->bindParam(":id", $_GET["classid"], PDO::PARAM_INT);
+
+    //execute the sql statement
+    $sth->execute();
+
+    //store the row from database into team
+    $class = $sth->fetch();
+
+    //set the database connection to null, to end the connection
+    $dbh = null;
+} else {
+	//start the session to get session variables
+	session_start();
+
+	//store the session array into variables
+	extract($_SESSION);
+
+	//unset the session variables
+	session_unset();
+}
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -34,7 +59,7 @@ session_unset();
 			<h1>Please provide the information below to add a new class to the list</h1>
 		</div>
 		<!--input form for the page-->
-		<form class="form-horizontal" method="post" action="add_class.php">
+		<form class="form-horizontal" method="post" action="<?php if (empty($_GET['classid'])): echo "add_class.php";else :  echo "edit_class.php"; endif; ?>">
 			<fieldset>
 				<legend>Class Information</legend>
 				<div class="form-group <?php if (isset($errClassName)): echo "has-error has-feedback"; endif; ?>">
@@ -42,42 +67,39 @@ session_unset();
 					<div class="col-sm-4">
 						<input class="form-control input-sm" type="text" name="class_name" max="30" required
 						pattern="[A-Za-z\s]{3,30}" placeholder="Class's name" title="Please enter correct class name"
-						<?php if (isset($class_name)): echo "value=" . $class_name; endif; ?>>
+						<?php if (isset($class['class_name'])): echo "value=" . $class['class_name']; endif; ?>>
 					</div>
 					<!--if the error is in the class name then it goes here-->
 					<?php if (isset($errClassName)): ?>
 					<div class="text-danger"><?= $errClassName ?></div>
 					<?php endif; ?>
 				</div>
-				<div class="form-group <?php if (isset($errClassHours)): echo "has-error has-feedback"; endif; ?>">
+				<div class="form-group">
 					<label class="col-sm-2 control-label" for="class_hours">Class Hours</label>
 					<div class="col-sm-4">
 						<input class="form-control input-sm" type="number" name="class_hours" min='0' step='1' max="24"
 						placeholder="Class's Hours" title="How many hours does this class do?"
-						<?php if (isset($class_hours)): echo "value=" . $class_hours; endif; ?>>
+						<?php if (isset($class['class_hours'])): echo "value=" . $class['class_hours']; endif; ?>>
 					</div>
-						<!--if the error is in the class hours then it goes here-->
-					<?php if (isset($errClassHours)): ?>
-					<div class="text-danger"><?= $errClassHours ?></div>
-					<?php endif; ?>
 				</div>
-				<div class="form-group<?php if (isset($errClassTeacherName)): echo "has-error has-feedback"; endif; ?>">
+				<div class="form-group">
 					<label class="col-sm-2 control-label" for="class_teacher_fname">Teacher's First Name</label>
 					<div class="col-sm-4">
 						<input class="form-control input-sm" type="text" name="class_teacher_fname" max="15"
 						pattern="[A-Za-z\s]{3,15}" placeholder="Class Teacher's first name"
 						title="Please provide correct teacher first name"
-						<?php if (isset($class_teacher_fname)): echo "value=" . $class_teacher_fname; endif; ?>>
+						<?php if (isset($class['class_teacher_fname'])): echo "value=" . $class['class_teacher_fname']; endif; ?>>
 					</div>
 					<div class="col-sm-4">
                         <input class="form-control input-sm" type="text" name="class_teacher_lname" max="15"
                                pattern="[A-Za-z\s]{3,15}" placeholder="Class Teacher's last name"
                                title="Please provide correct teacher last name"
-                            <?php if (isset($class_teacher_lname)): echo "value=" . $class_teacher_lname; endif; ?>>
+                            <?php if (isset($class['class_teacher_lname'])): echo "value=" . $class['class_teacher_lname']; endif; ?>>
                     </div>
 				</div>
 				<div class="input-group col-sm-offset-2">
-					<button class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Class</button>
+					<input type="hidden" name="id" value="<?php if (!empty($_GET['classid'])) : echo $class["id"] ;endif; ?>">
+					<button class="btn btn-primary"><i class=<?php if (empty($_GET['classid'])): echo "fa fa-plus";else:echo "fa fa-pencil";endif; ?>></i>&nbsp;&nbsp;<?php if (empty($_GET['classid'])): echo "Add Class";else : echo "Update Class";endif;?></button>
 				</div>
 			</fieldset>
 		</form>

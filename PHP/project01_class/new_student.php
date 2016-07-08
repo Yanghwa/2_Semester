@@ -1,34 +1,73 @@
 <?php
-//start the session to get session variables
-session_start();
+if (isset($_GET['studentid'])) {
 
-//store the session array into variables
-extract($_SESSION);
+    //get connect.php to connect to database
+    require "connect/connect.php";
 
-//unset the session variables
-session_unset();
+    //build the sql
+    $sql = "SELECT * FROM tblstudents WHERE id=:id";
 
-//get connect.php to connect to database
-require "connect/connect.php";
+    //prepare the sql statement
+    $sth = $dbh->prepare($sql);
 
-//build the sql
-$sql = "SELECT id, class_name FROM tblclasses";
+    //bind parameters
+    $sth->bindParam(':id', $_GET["studentid"], PDO::PARAM_INT);
 
-//prepare the sql statement
-$sth = $dbh->prepare($sql);
+    //execute the sql statement
+    $sth->execute();
 
-//execute the sql statement
-$sth->execute();
+    //store the row from database into player
+    $student = $sth->fetch();
 
-//store all the rows from database into classes
-$classes = $sth->fetchAll();
+    //build the sql
+    $sql = "SELECT id, class_name FROM tblclasses";
 
-//store all the row count from database into row_count
-$row_count = $sth->rowCount();
+    //prepare the sql statement
+    $sth = $dbh->prepare($sql);
 
-//set the database connection to null, to end the connection
-$dbh = null;
+    //execute the sql statement
+    $sth->execute();
 
+    //store all the rows from database into classes
+    $classes = $sth->fetchAll();
+
+    //store all the row count from database into row_count
+    $row_count = $sth->rowCount();
+
+    //set the database connection to null, to end the connection
+    $dbh = null;
+} //check if we can get classid then we can redirect to that class student page
+else {
+    //start the session to get session variables
+    session_start();
+
+    //store the session array into variables
+    extract($_SESSION);
+
+    //unset the session variables
+    session_unset();
+
+    //get connect.php to connect to database
+    require "connect/connect.php";
+
+    //build the sql
+    $sql = "SELECT id, class_name FROM tblclasses";
+
+    //prepare the sql statement
+    $sth = $dbh->prepare($sql);
+
+    //execute the sql statement
+    $sth->execute();
+
+    //store all the rows from database into classes
+    $classes = $sth->fetchAll();
+
+    //store all the row count from database into row_count
+    $row_count = $sth->rowCount();
+
+    //set the database connection to null, to end the connection
+    $dbh = null;
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -41,7 +80,7 @@ $dbh = null;
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet"
           integrity="sha384-aNUYGqSUL9wG/vP7+cWZ5QOM4gsQou3sBfWRr/8S3R1Lv0rysEmnwsRKMbhiQX/O" crossorigin="anonymous">
     <link href="stylesheets/common.css" rel="stylesheet">
-	<title>Class-Student</title>
+	<title>Add new Student</title>
 </head>
 <body>
 	<div class="container">
@@ -60,7 +99,7 @@ $dbh = null;
             <h1>Please provide the information below to add a new student to the list</h1>
         </div>
         <!--input form for the page-->
-        <form class="form-horizontal" method="post" action="add_student.php">
+        <form class="form-horizontal" method="post" action="<?php if (empty($_GET['studentid'])): echo "add_student.php";else :  echo "edit_student.php"; endif; ?>">
             <fieldset>
                 <legend>Student Information</legend>
                 <div class="form-group <?php if (isset($errClassId)): echo "has-error has-feedback"; endif; ?>">
@@ -70,7 +109,7 @@ $dbh = null;
                             <option value="selectclass" selected>----Select Class----</option>
                             <?php foreach ($classes as $class) : ?>
                                 <option value="<?= $class["id"] ?>"
-                                    <?php if (isset($class_id) && $class["id"] == $class_id): ?>
+                                    <?php if (isset($_GET["classid"]) && $class["id"] == $_GET["classid"]): ?>
                                         <?= "selected"; ?>
                                     <?php endif; ?>>
                                     <?= $class["class_name"] ?></option>
@@ -88,13 +127,13 @@ $dbh = null;
                         <input class="form-control input-sm" type="text" name="student_fname" max="15" required
                                pattern="[A-Za-z\s]{3,15}" placeholder="Student's first name"
                                title="Please provide correct first name"
-                            <?php if (isset($student_fname)): echo "value=" . $student_fname; endif; ?>>
+                            <?php if (isset($student['student_fname'])): echo "value=" . $student['student_fname']; endif; ?>>
                     </div>
                     <div class="col-sm-4">
                         <input class="form-control input-sm" type="text" name="student_lname" max="15" required
                                pattern="[A-Za-z\s]{3,15}" placeholder="Student's last name"
                                title="Please provide correct last name"
-                            <?php if (isset($student_lname)): echo "value=" . $student_lname; endif; ?>>
+                            <?php if (isset($student['student_lname'])): echo "value=" . $student['student_fname']; endif; ?>>
                     </div>
 				</div>
 				<div class="form-group <?php if (isset($errStudentId)): echo "has-error has-feedback"; endif; ?>">
@@ -102,7 +141,7 @@ $dbh = null;
 					<div class="col-sm-4">
 						<input class="form-control input-sm" type="number" name="student_id" required
 						placeholder="Student's ID" title="Please provide student id"
-						<?php if (isset($student_id)): echo "value=" . $student_id; endif; ?>>
+						<?php if (isset($student['student_id'])): echo "value=" . $student['student_id']; endif; ?>>
 					</div>
 				</div>
 
@@ -111,7 +150,8 @@ $dbh = null;
                     <div class="col-sm-4">
                         <input class="form-control input-sm" type="text" name="student_program" max="15"
                                pattern="[A-Za-z\s]{3,15}" placeholder="Student's Program"
-                               title="Please provide correct Program">
+                               title="Please provide correct Program"
+                               <?php if (isset($student['student_program'])): echo "value=" . $student['student_program']; endif; ?>>
                     </div>
 				</div>
 					<!--if the error is in the student id then it goes here-->
@@ -126,7 +166,8 @@ $dbh = null;
 					<div class="text-danger"><?= $errStudentId ?></div>
 				<?php endif; ?>
                 <div class="input-group col-sm-offset-2">
-                    <button class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Student</button>
+                    <input type="hidden" name="id" value="<?php if (!empty($_GET['studentid'])): echo $student['id'] ;endif; ?>">
+                    <button class="btn btn-primary"><i class=<?php if (empty($_GET['studentid'])): echo "fa fa-plus";else:echo "fa fa-pencil";endif; ?>></i>&nbsp;&nbsp;<?php if (empty($_GET['studentid'])): echo "Add Student";else : echo "Update Student";endif;?></button>
                 </div>
             </fieldset>
         </form>

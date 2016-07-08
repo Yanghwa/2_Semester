@@ -16,22 +16,6 @@ if (empty($class_name)) {
     $class_name = filter_var($class_name, FILTER_SANITIZE_STRING);
 }
 
-//validate and sanitize the class hours
-if (empty($class_hours)) {
-    $_SESSION["errClassHours"] = "Please enter the correct class hours";
-    $validated = false;
-} else {
-    $class_hours = filter_var($class_hours, FILTER_VALIDATE_INT);
-}
-
-//sanitize the teacher name
-if (empty($class_teacher_fname) || empty($class_teacher_lname)) {
-    $_SESSION["errClassTeacherName"] = "Please enter the correct teacher name";
-    $validated = false;
-} else {
-    $class_teacher_fname = filter_var($class_teacher_fname, FILTER_SANITIZE_STRING);
-    $class_teacher_lname = filter_var($class_teacher_lname, FILTER_SANITIZE_STRING);
-}
 //if there is any error redirect to form page and show the errors and populate the user's data
 if ($validated == false) {
     $_SESSION["errorClass"] = "Class could not be added due to the following error(s)";

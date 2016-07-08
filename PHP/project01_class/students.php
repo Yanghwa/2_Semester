@@ -29,7 +29,7 @@ $dbh = null;
           integrity="sha384-aNUYGqSUL9wG/vP7+cWZ5QOM4gsQou3sBfWRr/8S3R1Lv0rysEmnwsRKMbhiQX/O" crossorigin="anonymous">
     <link href="stylesheets/common.css" rel="stylesheet">
     <!--title of the page-->
-    <title>students</title>
+    <title>Students</title>
 </head>
 <body>
 <!-- This is a Bootstrap container. Get more info at http://getbootstrap.com/ -->
@@ -64,7 +64,7 @@ $dbh = null;
                         <td><?= $student["student_id"] ?></td>
                         <td><?= $student["student_program"] ?></td>
                         <td>
-                            <a href="update_student.php?studentid=<?= $student["id"] ?>&classid=<?= $student["class_id"] ?>"><i
+                            <a href="new_student.php?studentid=<?= $student["id"] ?>&classid=<?= $student["class_id"] ?>"><i
                                     class="fa fa-pencil"></i>&nbsp;&nbsp;Update</a>
                         </td>
                         <td>

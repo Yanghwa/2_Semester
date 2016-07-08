@@ -63,7 +63,7 @@ $dbh = null;
 								<td><?= $class["class_hours"] ?></td>
 								<td><?= $class["class_teacher_fname"] ." " .$class["class_teacher_lname"]?></td>
 								<td>
-									<a href="update_class.php?classid=<?= $class["id"] ?>"><i class="fa fa-pencil">
+									<a href="new_class.php?classid=<?= $class["id"] ?>"><i class="fa fa-pencil">
 									</i>&nbsp;&nbsp;Update</a>
 								</td>
 								<td>
